@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="5">
-    <iq:application id="c9d0e1f2-a3b4-4f78-2345-890abcdef123"
+    <iq:application id="d0e1f2a3-b4c5-4a89-3456-90abcdef1234"
                     type="datafield"
                     name="@Strings.AppName"
                     entry="TindeqFieldApp"

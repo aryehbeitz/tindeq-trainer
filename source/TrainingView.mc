@@ -34,39 +34,44 @@ class TrainingView extends WatchUi.View {
         dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 0.13, Graphics.FONT_SMALL, tm.getStateLabel(), Graphics.TEXT_JUSTIFY_CENTER);
 
-        // Set / Rep counter
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        var setRepText = "S" + tm.currentSet + "/" + tm.config.numSets +
-                         "  R" + tm.currentRep + "/" + tm.config.repsPerSet;
-        dc.drawText(cx, h * 0.22, Graphics.FONT_XTINY, setRepText, Graphics.TEXT_JUSTIFY_CENTER);
+        // Set / Rep counter (hide during countdown, show big countdown instead)
+        if (tm.state == TRAIN_COUNTDOWN) {
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 0.30, Graphics.FONT_NUMBER_THAI_HOT, tm.timeRemaining.toString(), Graphics.TEXT_JUSTIFY_CENTER);
+        } else {
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            var setRepText = "S" + tm.currentSet + "/" + tm.config.numSets +
+                             "  R" + tm.currentRep + "/" + tm.config.repsPerSet;
+            dc.drawText(cx, h * 0.22, Graphics.FONT_XTINY, setRepText, Graphics.TEXT_JUSTIFY_CENTER);
 
-        // Main force display
-        var forceKg = tm.currentForce;
-        if (forceKg < 0) { forceKg = 0.0; }
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 0.28, Graphics.FONT_NUMBER_HOT, forceKg.format("%.1f"), Graphics.TEXT_JUSTIFY_CENTER);
+            // Main force display
+            var forceKg = tm.currentForce;
+            if (forceKg < 0) { forceKg = 0.0; }
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 0.28, Graphics.FONT_NUMBER_HOT, forceKg.format("%.1f"), Graphics.TEXT_JUSTIFY_CENTER);
 
-        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 0.50, Graphics.FONT_TINY, "kg", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 0.50, Graphics.FONT_TINY, "kg", Graphics.TEXT_JUSTIFY_CENTER);
 
-        // Max force this rep + target indicator
-        var maxText = "MAX " + tm.maxForceRep.format("%.1f");
-        if (tm.config.targetForce > 0) {
-            maxText += " / " + tm.config.targetForce;
+            // Max force this rep + target indicator
+            var maxText = "MAX " + tm.maxForceRep.format("%.1f");
+            if (tm.config.targetForce > 0) {
+                maxText += " / " + tm.config.targetForce;
+            }
+            dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 0.58, Graphics.FONT_XTINY, maxText, Graphics.TEXT_JUSTIFY_CENTER);
+
+            // Force graph
+            var gx = (w * 0.12).toNumber();
+            var gy = (h * 0.73).toNumber();
+            var gw = (w * 0.76).toNumber();
+            var gh = (h * 0.12).toNumber();
+            tm.graph.draw(dc, gx, gy, gw, gh);
         }
-        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 0.58, Graphics.FONT_XTINY, maxText, Graphics.TEXT_JUSTIFY_CENTER);
 
-        // Timer countdown
+        // Timer — always visible
         dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 0.66, Graphics.FONT_MEDIUM, formatTimer(tm.timeRemaining), Graphics.TEXT_JUSTIFY_CENTER);
-
-        // Force graph
-        var gx = (w * 0.12).toNumber();
-        var gy = (h * 0.78).toNumber();
-        var gw = (w * 0.76).toNumber();
-        var gh = (h * 0.10).toNumber();
-        tm.graph.draw(dc, gx, gy, gw, gh);
     }
 
     function getAccentColor() {
