@@ -46,14 +46,14 @@ A full-featured Garmin watch app for training with the [Tindeq Progressor](https
 
 ### From Release
 
-1. Download `GripTrain2.prg` and `GripForceDF.prg` from the [latest release](https://github.com/aryehbeitz/tindeq-trainer/releases/latest)
+1. Download `TindeqTrainer.prg` and `TindeqForce.prg` from the [latest release](https://github.com/aryehbeitz/tindeq-trainer/releases/latest)
 2. Connect your watch via USB
 3. Copy both `.prg` files to `GARMIN/APPS/` on the watch
 4. Disconnect — **Tindeq Trainer** appears in Activities & Apps
 
 ### Data Field
 
-A lightweight **Tindeq Force** data field (`GripForceDF.prg`) is also included — add live force to any Garmin activity. After installing, add it to an activity's data screens via: start activity → long-press UP → Data Screens → edit → choose "Tindeq Force".
+A lightweight **Tindeq Force** data field (`TindeqForce.prg`) is also included — add live force to any Garmin activity. After installing, add it to an activity's data screens via: start activity → long-press UP → Data Screens → edit → choose "Tindeq Force".
 
 ### Building
 
