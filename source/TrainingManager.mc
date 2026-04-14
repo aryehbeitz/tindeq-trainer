@@ -266,13 +266,13 @@ class TrainingManager {
     }
 
     function vibeShort() {
-        if (Attention has :vibrate) {
+        if (Attention has :vibrate && SettingsView.getVibrateEnabled()) {
             Attention.vibrate([new Attention.VibeProfile(50, 200)]);
         }
     }
 
     function vibeLong() {
-        if (Attention has :vibrate) {
+        if (Attention has :vibrate && SettingsView.getVibrateEnabled()) {
             Attention.vibrate([new Attention.VibeProfile(100, 500)]);
         }
     }

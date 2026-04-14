@@ -12,7 +12,7 @@ class MainMenuView extends WatchUi.Menu2 {
         addItem(new WatchUi.MenuItem("Programs", "Saved workouts", :programs, null));
         addItem(new WatchUi.MenuItem("History", "Past sessions", :history, null));
 
-        addItem(new WatchUi.MenuItem("Info", "v1.4", :info, null));
+        addItem(new WatchUi.MenuItem("Settings", null, :settings, null));
     }
 }
 
@@ -55,9 +55,9 @@ class MainMenuDelegate extends WatchUi.Menu2InputDelegate {
         } else if (id == :history) {
             var view = new HistoryView();
             WatchUi.pushView(view, new HistoryDelegate(view), WatchUi.SLIDE_LEFT);
-        } else if (id == :info) {
-            // Refresh battery
-            getApp().bleManager.getBatteryVoltage();
+        } else if (id == :settings) {
+            var view = new SettingsView();
+            WatchUi.pushView(view, new SettingsDelegate(), WatchUi.SLIDE_LEFT);
         }
     }
 

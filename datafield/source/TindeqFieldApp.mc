@@ -11,8 +11,7 @@ class TindeqFieldApp extends Application.AppBase {
     function onStart(state) {
         bleManager = new TindeqFieldBle();
         bleManager.registerProfiles();
-        // Auto-start scanning
-        bleManager.startScanning();
+        // Don't scan yet — wait for onProfileRegister callback
     }
 
     function onStop(state) {

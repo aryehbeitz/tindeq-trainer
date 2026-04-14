@@ -2,7 +2,6 @@ using Toybox.BluetoothLowEnergy as Ble;
 using Toybox.System;
 using Toybox.Timer;
 
-// Connection states
 enum {
     DF_IDLE,
     DF_SCANNING,
@@ -18,12 +17,9 @@ class TindeqFieldBle extends Ble.BleDelegate {
 
     var currentForce = 0.0;
     var maxForce = 0.0;
-    var timestamp = 0;
 
-    var reconnectTimer = null;
-    var reconnectRetries = 0;
+    var scanTimer = null;
 
-    // UUIDs
     var serviceUuid;
     var dataUuid;
     var ctrlUuid;
@@ -54,21 +50,28 @@ class TindeqFieldBle extends Ble.BleDelegate {
 
     function onProfileRegister(uuid, status) {
         profileRegistered = (status == Ble.STATUS_SUCCESS);
+        if (profileRegistered) {
+            // Now safe to scan
+            startScanning();
+        }
     }
 
     function startScanning() {
-        if (profileRegistered) {
-            if (reconnectTimer != null) { reconnectTimer.stop(); }
-            connectionState = DF_SCANNING;
-            Ble.setScanState(Ble.SCAN_STATE_SCANNING);
-        }
+        if (!profileRegistered || connectionState == DF_READY) { return; }
+        connectionState = DF_SCANNING;
+        Ble.setScanState(Ble.SCAN_STATE_SCANNING);
     }
 
     function stopScanning() {
         Ble.setScanState(Ble.SCAN_STATE_OFF);
         connectionState = DF_IDLE;
-        if (reconnectTimer != null) { reconnectTimer.stop(); }
-        reconnectRetries = 0;
+    }
+
+    // Called from compute() to retry if not connected
+    function ensureConnected() {
+        if (connectionState == DF_IDLE && profileRegistered) {
+            startScanning();
+        }
     }
 
     function onScanResults(scanResults) {
@@ -92,28 +95,11 @@ class TindeqFieldBle extends Ble.BleDelegate {
         if (state == Ble.CONNECTION_STATE_CONNECTED) {
             self.device = device;
             connectionState = DF_CONNECTED;
-            reconnectRetries = 0;
             enableNotifications();
         } else {
             connectionState = DF_IDLE;
             self.device = null;
-            attemptReconnect();
-        }
-    }
-
-    function attemptReconnect() {
-        if (reconnectRetries >= 5) { return; }
-        reconnectRetries++;
-        connectionState = DF_SCANNING;
-        if (reconnectTimer == null) {
-            reconnectTimer = new Timer.Timer();
-        }
-        reconnectTimer.start(method(:doReconnect), 2000, false);
-    }
-
-    function doReconnect() as Void {
-        if (connectionState == DF_SCANNING && profileRegistered) {
-            Ble.setScanState(Ble.SCAN_STATE_SCANNING);
+            // Will retry via ensureConnected() on next compute()
         }
     }
 
@@ -126,7 +112,6 @@ class TindeqFieldBle extends Ble.BleDelegate {
         var cccd = dataChar.getDescriptor(cccdUuid);
         if (cccd != null) {
             cccd.requestWrite([0x01, 0x00]b);
-            connectionState = DF_READY;
         }
     }
 
@@ -162,7 +147,7 @@ class TindeqFieldBle extends Ble.BleDelegate {
 
     function onCharacteristicChanged(char, value) {
         if (value == null || value.size() < 10) { return; }
-        if (value[0] != 1) { return; }  // Only weight measurements
+        if (value[0] != 1) { return; }
 
         var b0 = value[2]; var b1 = value[3];
         var b2 = value[4]; var b3 = value[5];
