@@ -1,5 +1,6 @@
 using Toybox.WatchUi;
 using Toybox.Graphics;
+using Toybox.System;
 
 enum {
     CFG_HANG_TIME,
@@ -7,12 +8,15 @@ enum {
     CFG_REPS,
     CFG_SET_REST,
     CFG_SETS,
+    CFG_TARGET,
     CFG_COUNT
 }
 
 class ConfigView extends WatchUi.View {
     var selectedField = CFG_HANG_TIME;
     var config;
+    var statusMsg = "";
+    var statusTimer = 0;
 
     function initialize() {
         View.initialize();
@@ -32,19 +36,20 @@ class ConfigView extends WatchUi.View {
 
         // Round-safe layout
         dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 0.13, Graphics.FONT_SMALL, "SETUP", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(cx, h * 0.13, Graphics.FONT_SMALL, "REPEATERS", Graphics.TEXT_JUSTIFY_CENTER);
 
-        var labels = ["Hang", "Rest", "Reps", "Set Rest", "Sets"];
+        var labels = ["Hang", "Rest", "Reps", "Set Rest", "Sets", "Target"];
         var values = [
             config.hangTime + "s",
             config.repRest + "s",
             config.repsPerSet.toString(),
             formatTime(config.setRest),
-            config.numSets.toString()
+            config.numSets.toString(),
+            config.targetForce > 0 ? config.targetForce + "kg" : "Off"
         ];
 
-        var startY = h * 0.24;
-        var lineH = h * 0.12;
+        var startY = h * 0.23;
+        var lineH = h * 0.10;
 
         for (var i = 0; i < CFG_COUNT; i++) {
             var y = startY + (i * lineH);
@@ -52,19 +57,30 @@ class ConfigView extends WatchUi.View {
 
             if (isSelected) {
                 dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT);
-                dc.fillRoundedRectangle(cx - w * 0.38, y - 2, w * 0.76, lineH - 4, 6);
+                dc.fillRoundedRectangle(cx - w * 0.38, y - 2, w * 0.76, lineH - 2, 5);
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             } else {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
             }
 
-            dc.drawText(cx - w * 0.30, y, Graphics.FONT_TINY, labels[i], Graphics.TEXT_JUSTIFY_LEFT);
-            dc.drawText(cx + w * 0.30, y, Graphics.FONT_TINY, values[i], Graphics.TEXT_JUSTIFY_RIGHT);
+            dc.drawText(cx - w * 0.30, y, Graphics.FONT_XTINY, labels[i], Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(cx + w * 0.30, y, Graphics.FONT_XTINY, values[i], Graphics.TEXT_JUSTIFY_RIGHT);
         }
 
-        // Hint at bottom (within round safe zone)
-        dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 0.84, Graphics.FONT_XTINY, "START=Go  BACK=Exit", Graphics.TEXT_JUSTIFY_CENTER);
+        // Status message (tare feedback, save feedback)
+        if (!statusMsg.equals("")) {
+            dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 0.84, Graphics.FONT_XTINY, statusMsg, Graphics.TEXT_JUSTIFY_CENTER);
+        } else {
+            dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 0.84, Graphics.FONT_XTINY, "START=Go  BACK=Menu", Graphics.TEXT_JUSTIFY_CENTER);
+        }
+    }
+
+    function showStatus(msg) {
+        statusMsg = msg;
+        statusTimer = 20;  // ~2 seconds at 10Hz update
+        WatchUi.requestUpdate();
     }
 
     function formatTime(seconds) {
@@ -98,6 +114,9 @@ class ConfigView extends WatchUi.View {
             case CFG_SETS:
                 config.numSets = clamp(config.numSets + delta, 1, 10);
                 break;
+            case CFG_TARGET:
+                config.targetForce = clamp(config.targetForce + delta, 0, 100);
+                break;
         }
         WatchUi.requestUpdate();
     }
@@ -130,10 +149,10 @@ class ConfigDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onBack() {
-        // Exit app - disconnect BLE
-        var ble = getApp().bleManager;
-        ble.disconnect();
-        return false;  // false = exit app
+        // Back to main menu
+        var menu = new MainMenuView();
+        WatchUi.switchToView(menu, new MainMenuDelegate(), WatchUi.SLIDE_RIGHT);
+        return true;
     }
 
     function onNextPage() {

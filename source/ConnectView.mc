@@ -28,8 +28,8 @@ class ConnectView extends WatchUi.View {
             statusText = "Connecting...";
         } else if (bleManager.isConnected()) {
             refreshTimer.stop();
-            var view = new ConfigView();
-            WatchUi.switchToView(view, new ConfigDelegate(view), WatchUi.SLIDE_LEFT);
+            var menu = new MainMenuView();
+            WatchUi.switchToView(menu, new MainMenuDelegate(), WatchUi.SLIDE_LEFT);
             return;
         }
         WatchUi.requestUpdate();

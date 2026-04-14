@@ -1,5 +1,6 @@
 using Toybox.WatchUi;
 using Toybox.Graphics;
+using Toybox.System;
 
 class ResultsView extends WatchUi.View {
     var tm;
@@ -22,7 +23,6 @@ class ResultsView extends WatchUi.View {
         var h = dc.getHeight();
         var cx = w / 2;
 
-        // Round-safe layout
         dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 0.13, Graphics.FONT_MEDIUM, "DONE", Graphics.TEXT_JUSTIFY_CENTER);
 
@@ -32,7 +32,7 @@ class ResultsView extends WatchUi.View {
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 0.42, Graphics.FONT_TINY, "kg peak", Graphics.TEXT_JUSTIFY_CENTER);
 
-        // Per-set breakdown (max 3 visible on round display)
+        // Per-set breakdown (max 3)
         var startY = h * 0.52;
         var lineH = h * 0.10;
         var maxVisible = 3;
@@ -60,9 +60,8 @@ class ResultsView extends WatchUi.View {
             dc.drawText(cx + w * 0.30, y, Graphics.FONT_XTINY, setMax.format("%.1f") + "/" + setAvg.format("%.1f"), Graphics.TEXT_JUSTIFY_RIGHT);
         }
 
-        // Total reps + exit hint
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 0.84, Graphics.FONT_XTINY, tm.getTotalReps() + " reps | BACK=Exit", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(cx, h * 0.84, Graphics.FONT_XTINY, tm.getTotalReps() + " reps | Saved | BACK=Menu", Graphics.TEXT_JUSTIFY_CENTER);
     }
 }
 
@@ -72,17 +71,15 @@ class ResultsDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onBack() {
-        // Back to config for another session
-        var configView = new ConfigView();
-        WatchUi.switchToView(configView, new ConfigDelegate(configView), WatchUi.SLIDE_RIGHT);
+        var menu = new MainMenuView();
+        WatchUi.switchToView(menu, new MainMenuDelegate(), WatchUi.SLIDE_RIGHT);
         return true;
     }
 
     function onSelect() {
-        // Exit app
-        var ble = getApp().bleManager;
-        ble.disconnect();
-        System.exit();
+        // Also go to menu
+        var menu = new MainMenuView();
+        WatchUi.switchToView(menu, new MainMenuDelegate(), WatchUi.SLIDE_RIGHT);
         return true;
     }
 }

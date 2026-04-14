@@ -20,6 +20,7 @@ class TrainingConfig {
     var setRest = 180;      // seconds between sets
     var numSets = 4;        // total sets
     var countdownTime = 5;  // countdown before first hang
+    var targetForce = 0;    // kg, 0 = disabled
 
     function initialize() {}
 }
@@ -65,11 +66,20 @@ class TrainingManager {
     var repResults = [];
     var setResults = [];     // array of arrays of RepResult
 
-    // No callbacks - use WatchUi.requestUpdate() directly
+    // Target force tracking
+    var belowTargetMs = 0;
+    var targetWarned = false;
+
+    // Force graph
+    var graph;
+
+    // Session timing
+    var sessionStartMs = 0;
 
     function initialize() {
         config = new TrainingConfig();
         timer = new Timer.Timer();
+        graph = new ForceGraph();
     }
 
     function start() {
@@ -78,6 +88,12 @@ class TrainingManager {
         maxForceSession = 0.0;
         repResults = [];
         setResults = [];
+        graph.clear();
+        if (config.targetForce > 0) {
+            graph.setTarget(config.targetForce.toFloat());
+        }
+        sessionStartMs = System.getTimer();
+        getApp().startFitRecording();
         enterCountdown();
     }
 
@@ -123,6 +139,7 @@ class TrainingManager {
         repResults = [];
         timeRemaining = config.setRest;
         elapsedMs = 0;
+        getApp().addFitLap();
         startTimer();
         notifyStateChange();
         vibeLong();
@@ -138,6 +155,21 @@ class TrainingManager {
         state = TRAIN_COMPLETE;
         notifyStateChange();
         vibeLong();
+        // Stop FIT recording
+        getApp().stopFitRecording(maxForceSession);
+        // Auto-save to history
+        var durSec = (System.getTimer() - sessionStartMs) / 1000;
+        var avgForce = 0.0;
+        var totalSamples = 0;
+        for (var s = 0; s < setResults.size(); s++) {
+            for (var r = 0; r < setResults[s].size(); r++) {
+                avgForce += setResults[s][r].avgForce;
+                totalSamples++;
+            }
+        }
+        if (totalSamples > 0) { avgForce = avgForce / totalSamples; }
+        getApp().historyManager.saveSession("repeater", maxForceSession, avgForce,
+            setResults.size(), getTotalReps(), durSec);
     }
 
     function startTimer() {
@@ -163,6 +195,23 @@ class TrainingManager {
         var ble = getApp().bleManager;
         if (ble != null) {
             updateForce(ble.currentForce, ble.timestamp);
+        }
+        // Update force graph
+        graph.addSample(currentForce);
+        // Update FIT recording
+        getApp().updateFitForce(currentForce);
+        // Target force warning during hang
+        if (state == TRAIN_HANG && config.targetForce > 0 && currentForce > 1.0) {
+            if (currentForce < config.targetForce.toFloat()) {
+                belowTargetMs += 100;
+                if (belowTargetMs >= 500 && !targetWarned) {
+                    vibeShort();
+                    targetWarned = true;
+                }
+            } else {
+                belowTargetMs = 0;
+                targetWarned = false;
+            }
         }
         WatchUi.requestUpdate();
     }

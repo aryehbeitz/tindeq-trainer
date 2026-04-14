@@ -49,7 +49,10 @@ class TindeqBleManager extends Ble.BleDelegate {
     var firmwareVersion = "";
     var lowBattery = false;
 
-    // No callbacks - views read data directly
+    // Auto-reconnect
+    var reconnectTimer = null;
+    var reconnectRetries = 0;
+    const MAX_RECONNECT = 5;
 
     // UUIDs
     var progressorServiceUuid;
@@ -130,11 +133,34 @@ class TindeqBleManager extends Ble.BleDelegate {
             System.println("Connected to Progressor");
             self.device = device;
             connectionState = STATE_CONNECTED;
+            reconnectRetries = 0;
             enableNotifications();
         } else {
             System.println("Disconnected from Progressor");
             connectionState = STATE_IDLE;
             self.device = null;
+            // Auto-reconnect
+            attemptReconnect();
+        }
+    }
+
+    function attemptReconnect() {
+        if (reconnectRetries >= MAX_RECONNECT) {
+            System.println("Max reconnect attempts reached");
+            return;
+        }
+        reconnectRetries++;
+        System.println("Reconnecting... attempt " + reconnectRetries);
+        connectionState = STATE_SCANNING;
+        if (reconnectTimer == null) {
+            reconnectTimer = new Timer.Timer();
+        }
+        reconnectTimer.start(method(:doReconnect), 2000, false);
+    }
+
+    function doReconnect() as Void {
+        if (connectionState == STATE_SCANNING && profileRegistered) {
+            Ble.setScanState(Ble.SCAN_STATE_SCANNING);
         }
     }
 
@@ -162,6 +188,8 @@ class TindeqBleManager extends Ble.BleDelegate {
         if (status == Ble.STATUS_SUCCESS) {
             System.println("CCCD write success - notifications active");
             connectionState = STATE_READY;
+            // Query battery on connect
+            getBatteryVoltage();
         } else {
             System.println("CCCD write failed: " + status);
         }
