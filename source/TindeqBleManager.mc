@@ -99,6 +99,10 @@ class TindeqBleManager extends Ble.BleDelegate {
 
     function startScanning() {
         if (profileRegistered) {
+            // Ensure clean state before scanning
+            if (reconnectTimer != null) {
+                reconnectTimer.stop();
+            }
             connectionState = STATE_SCANNING;
             Ble.setScanState(Ble.SCAN_STATE_SCANNING);
             System.println("Scanning for Progressor...");
@@ -107,6 +111,12 @@ class TindeqBleManager extends Ble.BleDelegate {
 
     function stopScanning() {
         Ble.setScanState(Ble.SCAN_STATE_OFF);
+        connectionState = STATE_IDLE;
+        // Cancel any pending reconnect
+        if (reconnectTimer != null) {
+            reconnectTimer.stop();
+        }
+        reconnectRetries = 0;
     }
 
     function onScanResults(scanResults) {

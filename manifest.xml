@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="5">
-    <iq:application id="f6a7b8c9-d0e1-4c45-f012-567890abcdef"
+    <iq:application id="b8c9d0e1-f2a3-4e67-1234-7890abcdef12"
                     type="watch-app"
                     name="@Strings.AppName"
                     entry="TindeqTrainerApp"

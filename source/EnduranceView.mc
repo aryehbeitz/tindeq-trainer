@@ -186,8 +186,7 @@ class EnduranceDelegate extends WatchUi.BehaviorDelegate {
     function onBack() {
         if (view.timer != null) { view.timer.stop(); }
         getApp().bleManager.stopMeasurement();
-        var menu = new MainMenuView();
-        WatchUi.switchToView(menu, new MainMenuDelegate(), WatchUi.SLIDE_RIGHT);
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
         return true;
     }
 

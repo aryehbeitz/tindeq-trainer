@@ -149,9 +149,8 @@ class ConfigDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onBack() {
-        // Back to main menu
-        var menu = new MainMenuView();
-        WatchUi.switchToView(menu, new MainMenuDelegate(), WatchUi.SLIDE_RIGHT);
+        // Pop back to main menu
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
         return true;
     }
 

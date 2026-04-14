@@ -71,15 +71,13 @@ class ResultsDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onBack() {
-        var menu = new MainMenuView();
-        WatchUi.switchToView(menu, new MainMenuDelegate(), WatchUi.SLIDE_RIGHT);
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
         return true;
     }
 
     function onSelect() {
         // Also go to menu
-        var menu = new MainMenuView();
-        WatchUi.switchToView(menu, new MainMenuDelegate(), WatchUi.SLIDE_RIGHT);
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
         return true;
     }
 }

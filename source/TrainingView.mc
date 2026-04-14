@@ -117,8 +117,8 @@ class TrainingDelegate extends WatchUi.BehaviorDelegate {
             var resultsView = new ResultsView();
             WatchUi.switchToView(resultsView, new ResultsDelegate(), WatchUi.SLIDE_LEFT);
         } else {
-            var menu = new MainMenuView();
-            WatchUi.switchToView(menu, new MainMenuDelegate(), WatchUi.SLIDE_RIGHT);
+            // Pop back to menu (Config was pushed from menu, Training replaced Config)
+            WatchUi.popView(WatchUi.SLIDE_RIGHT);
         }
         return true;
     }
