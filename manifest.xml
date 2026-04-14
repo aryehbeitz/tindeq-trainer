@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="5">
+    <iq:application id="e5f6a7b8-c9d0-4b34-ef01-4567890abcde"
+                    type="watch-app"
+                    name="@Strings.AppName"
+                    entry="TindeqTrainerApp"
+                    launcherIcon="@Drawables.LauncherIcon"
+                    minApiLevel="3.4.0">
+        <iq:permissions>
+            <iq:uses-permission id="BluetoothLowEnergy"/>
+        </iq:permissions>
+        <iq:products>
+            <iq:product id="fr955"/>
+        </iq:products>
+        <iq:languages>
+            <iq:language>eng</iq:language>
+        </iq:languages>
+        <iq:barrels/>
+    </iq:application>
+</iq:manifest>

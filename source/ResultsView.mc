@@ -1,0 +1,88 @@
+using Toybox.WatchUi;
+using Toybox.Graphics;
+
+class ResultsView extends WatchUi.View {
+    var tm;
+
+    function initialize() {
+        View.initialize();
+    }
+
+    function onLayout(dc) {
+        tm = getApp().trainingManager;
+    }
+
+    function onUpdate(dc) {
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.clear();
+
+        if (tm == null) { tm = getApp().trainingManager; }
+
+        var w = dc.getWidth();
+        var h = dc.getHeight();
+        var cx = w / 2;
+
+        // Round-safe layout
+        dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, h * 0.13, Graphics.FONT_MEDIUM, "DONE", Graphics.TEXT_JUSTIFY_CENTER);
+
+        // Session max force
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, h * 0.26, Graphics.FONT_NUMBER_MILD, tm.maxForceSession.format("%.1f"), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, h * 0.42, Graphics.FONT_TINY, "kg peak", Graphics.TEXT_JUSTIFY_CENTER);
+
+        // Per-set breakdown (max 3 visible on round display)
+        var startY = h * 0.52;
+        var lineH = h * 0.10;
+        var maxVisible = 3;
+        if (tm.setResults.size() < maxVisible) { maxVisible = tm.setResults.size(); }
+
+        for (var s = 0; s < maxVisible; s++) {
+            var setData = tm.setResults[s];
+            var setMax = 0.0;
+            var setAvg = 0.0;
+            var count = 0;
+
+            for (var r = 0; r < setData.size(); r++) {
+                if (setData[r].maxForce > setMax) {
+                    setMax = setData[r].maxForce;
+                }
+                setAvg += setData[r].avgForce;
+                count++;
+            }
+            if (count > 0) { setAvg = setAvg / count; }
+
+            var y = startY + (s * lineH);
+            dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx - w * 0.30, y, Graphics.FONT_XTINY, "Set " + (s + 1), Graphics.TEXT_JUSTIFY_LEFT);
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx + w * 0.30, y, Graphics.FONT_XTINY, setMax.format("%.1f") + "/" + setAvg.format("%.1f"), Graphics.TEXT_JUSTIFY_RIGHT);
+        }
+
+        // Total reps + exit hint
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, h * 0.84, Graphics.FONT_XTINY, tm.getTotalReps() + " reps | BACK=Exit", Graphics.TEXT_JUSTIFY_CENTER);
+    }
+}
+
+class ResultsDelegate extends WatchUi.BehaviorDelegate {
+    function initialize() {
+        BehaviorDelegate.initialize();
+    }
+
+    function onBack() {
+        // Back to config for another session
+        var configView = new ConfigView();
+        WatchUi.switchToView(configView, new ConfigDelegate(configView), WatchUi.SLIDE_RIGHT);
+        return true;
+    }
+
+    function onSelect() {
+        // Exit app
+        var ble = getApp().bleManager;
+        ble.disconnect();
+        System.exit();
+        return true;
+    }
+}
