@@ -2,9 +2,19 @@
 
 A full-featured Garmin watch app for training with the [Tindeq Progressor](https://tindeq.com/) force gauge. No phone needed during training — the watch connects directly to the Progressor via Bluetooth Low Energy.
 
-**Target device:** Forerunner 955 (round 260×260 MIP display)
-
 > **Note:** This is the first Tindeq Progressor app on the Garmin Connect IQ platform.
+
+### Supported Watches (38 devices)
+
+| Series | Models |
+|--------|--------|
+| **Forerunner** | FR255, FR255M, FR265, FR265S, FR955, FR965, FR970 |
+| **Fenix** | Fenix 7/7S/7X, Fenix 7 Pro/7S Pro/7X Pro, Fenix 8 (43/47mm), Fenix 8 Pro 47mm, Fenix 8 Solar (47/51mm), Fenix E |
+| **Epix** | Epix 2, Epix 2 Pro (42/47/51mm) |
+| **Venu** | Venu 2/2S/2 Plus, Venu 3/3S, Venu 4 (41/45mm) |
+| **Other** | Enduro 3, Vivoactive 5/6, MARQ 2/2 Aviator, Instinct 3 AMOLED (45/50mm) |
+
+**Tested on:** Forerunner 955. Other devices should work but are untested — please [open an issue](https://github.com/aryehbeitz/tindeq-trainer/issues) if you find problems on your watch.
 
 ## Features
 
@@ -34,12 +44,16 @@ A full-featured Garmin watch app for training with the [Tindeq Progressor](https
 
 ## Installation
 
-### Sideloading (Developer Mode)
+### From Release
 
-1. Build the `.prg` file (see [Building](#building))
-2. Connect FR955 via USB
+1. Download `GripTrain.prg` from the [latest release](https://github.com/aryehbeitz/tindeq-trainer/releases/latest)
+2. Connect your watch via USB
 3. Copy the `.prg` to `GARMIN/APPS/` on the watch
 4. Disconnect — app appears in Activities & Apps
+
+### Data Field
+
+A lightweight **Tindeq Force** data field is also available — add live force to any Garmin activity. Download `TindeqForce.prg` from the release and install the same way.
 
 ### Building
 
