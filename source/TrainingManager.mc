@@ -310,4 +310,17 @@ class TrainingManager {
         }
         return total;
     }
+
+    // Average force across all HANG samples in the current set
+    // (excludes rest periods; repResults is cleared between sets)
+    function getSetAverage() {
+        var totalSum = 0.0;
+        var totalCount = 0;
+        for (var i = 0; i < repResults.size(); i++) {
+            totalSum += repResults[i].forceSum;
+            totalCount += repResults[i].sampleCount;
+        }
+        if (totalCount == 0) { return 0.0; }
+        return totalSum / totalCount;
+    }
 }

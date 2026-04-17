@@ -58,8 +58,9 @@ class TrainingView extends WatchUi.View {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, h * 0.50, Graphics.FONT_TINY, "kg", Graphics.TEXT_JUSTIFY_CENTER);
 
-            // Max force this rep + target indicator
-            var maxText = "MAX " + tm.maxForceRep.format("%.1f");
+            // Max (rep) and set average (hang-time only)
+            var maxText = "MAX " + tm.maxForceRep.format("%.1f") +
+                          "  AVG " + tm.getSetAverage().format("%.1f");
             if (tm.config.targetForce > 0) {
                 maxText += " / " + tm.config.targetForce;
             }
@@ -76,9 +77,11 @@ class TrainingView extends WatchUi.View {
             }
         }
 
-        // Timer — always visible
-        dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(cx, h * 0.66, Graphics.FONT_MEDIUM, formatTimer(tm.timeRemaining), Graphics.TEXT_JUSTIFY_CENTER);
+        // Timer — hidden during COUNTDOWN (big number already shows the seconds)
+        if (tm.state != TRAIN_COUNTDOWN) {
+            dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 0.66, Graphics.FONT_MEDIUM, formatTimer(tm.timeRemaining), Graphics.TEXT_JUSTIFY_CENTER);
+        }
     }
 
     function getAccentColor() {
