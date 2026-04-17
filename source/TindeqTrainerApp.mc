@@ -48,7 +48,7 @@ class TindeqTrainerApp extends Application.AppBase {
         fitSession = ActivityRecording.createSession({
             :name => "Hangboard",
             :sport => Activity.SPORT_TRAINING,
-            :subSport => Activity.SUB_SPORT_STRENGTH_TRAINING
+            :subSport => Activity.SUB_SPORT_GENERIC
         });
         forceField = fitSession.createField("force_kg", 0,
             FitContributor.DATA_TYPE_FLOAT,
@@ -62,12 +62,6 @@ class TindeqTrainerApp extends Application.AppBase {
     function updateFitForce(force) {
         if (forceField != null) {
             forceField.setData(force);
-        }
-    }
-
-    function addFitLap() {
-        if (fitSession != null && fitSession.isRecording()) {
-            fitSession.addLap();
         }
     }
 

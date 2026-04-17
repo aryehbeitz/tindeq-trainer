@@ -161,7 +161,6 @@ class TrainingManager {
         repResults = [];
         timeRemaining = config.setRest;
         elapsedMs = 0;
-        getApp().addFitLap();
         startTimer();
         notifyStateChange();
         vibeLong();
