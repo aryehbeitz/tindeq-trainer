@@ -40,8 +40,13 @@ class TrainingView extends WatchUi.View {
             dc.drawText(cx, h * 0.30, Graphics.FONT_NUMBER_THAI_HOT, tm.timeRemaining.toString(), Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            var setRepText = "S" + tm.currentSet + "/" + tm.config.numSets +
+            var setRepText;
+            if (tm.currentSet <= 1) {
+                setRepText = "R" + tm.currentRep + "/" + tm.config.repsPerSet;
+            } else {
+                setRepText = "S" + tm.currentSet + "/" + tm.config.numSets +
                              "  R" + tm.currentRep + "/" + tm.config.repsPerSet;
+            }
             dc.drawText(cx, h * 0.22, Graphics.FONT_XTINY, setRepText, Graphics.TEXT_JUSTIFY_CENTER);
 
             // Main force display
@@ -61,12 +66,14 @@ class TrainingView extends WatchUi.View {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, h * 0.58, Graphics.FONT_XTINY, maxText, Graphics.TEXT_JUSTIFY_CENTER);
 
-            // Force graph
-            var gx = (w * 0.12).toNumber();
-            var gy = (h * 0.73).toNumber();
-            var gw = (w * 0.76).toNumber();
-            var gh = (h * 0.12).toNumber();
-            tm.graph.draw(dc, gx, gy, gw, gh);
+            // Force graph — only during active HANG (hidden during rests)
+            if (tm.state == TRAIN_HANG) {
+                var gx = (w * 0.12).toNumber();
+                var gy = (h * 0.73).toNumber();
+                var gw = (w * 0.76).toNumber();
+                var gh = (h * 0.12).toNumber();
+                tm.graph.draw(dc, gx, gy, gw, gh);
+            }
         }
 
         // Timer — always visible

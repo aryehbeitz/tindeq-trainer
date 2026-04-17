@@ -2,6 +2,7 @@ using Toybox.Timer;
 using Toybox.System;
 using Toybox.WatchUi;
 using Toybox.Attention;
+using Toybox.Application.Storage;
 
 // Training states
 enum {
@@ -22,7 +23,28 @@ class TrainingConfig {
     var countdownTime = 5;  // countdown before first hang
     var targetForce = 0;    // kg, 0 = disabled
 
-    function initialize() {}
+    function initialize() {
+        load();
+    }
+
+    function load() {
+        var v;
+        v = Storage.getValue("cfg_hangTime");    if (v != null) { hangTime = v; }
+        v = Storage.getValue("cfg_repRest");     if (v != null) { repRest = v; }
+        v = Storage.getValue("cfg_repsPerSet");  if (v != null) { repsPerSet = v; }
+        v = Storage.getValue("cfg_setRest");     if (v != null) { setRest = v; }
+        v = Storage.getValue("cfg_numSets");     if (v != null) { numSets = v; }
+        v = Storage.getValue("cfg_targetForce"); if (v != null) { targetForce = v; }
+    }
+
+    function save() {
+        Storage.setValue("cfg_hangTime", hangTime);
+        Storage.setValue("cfg_repRest", repRest);
+        Storage.setValue("cfg_repsPerSet", repsPerSet);
+        Storage.setValue("cfg_setRest", setRest);
+        Storage.setValue("cfg_numSets", numSets);
+        Storage.setValue("cfg_targetForce", targetForce);
+    }
 }
 
 class RepResult {

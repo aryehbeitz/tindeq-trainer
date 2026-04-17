@@ -11,7 +11,7 @@ class SettingsView extends WatchUi.Menu2 {
         addItem(new WatchUi.ToggleMenuItem("Vibrate", null, :vibrate, vibrateOn, null));
 
         // Info (non-interactive)
-        addItem(new WatchUi.MenuItem("Version", "v1.7", :version, null));
+        addItem(new WatchUi.MenuItem("Version", "v1.8", :version, null));
 
         var ble = getApp().bleManager;
         if (!ble.firmwareVersion.equals("")) {

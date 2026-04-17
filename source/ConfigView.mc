@@ -145,8 +145,9 @@ class ConfigDelegate extends WatchUi.BehaviorDelegate {
 
     function onSelect() {
         if (view.editing) {
-            // Exit edit mode
+            // Exit edit mode and persist config
             view.editing = false;
+            view.config.save();
             WatchUi.requestUpdate();
             return true;
         }
@@ -169,8 +170,9 @@ class ConfigDelegate extends WatchUi.BehaviorDelegate {
 
     function onBack() {
         if (view.editing) {
-            // Exit edit mode
+            // Exit edit mode and persist config
             view.editing = false;
+            view.config.save();
             WatchUi.requestUpdate();
             return true;
         }
